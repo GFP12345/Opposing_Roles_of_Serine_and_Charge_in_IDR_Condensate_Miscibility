@@ -181,7 +181,6 @@ FEAT_LABELS_ORDERED = [
     'H', 'R', 'K', 'D', 'E', 'ED', 'KRH', 'EDKRH',
 ]
 BRACKETS = [
-    ('Spacers\nresidues',   9,  11),
     ('Aromatic\nresidues', 12,  15),
     ('Charged\nresidues',  16,  23),
 ]
