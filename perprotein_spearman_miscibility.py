@@ -177,10 +177,10 @@ ax.legend(handles=legend_elements, loc='upper right', fontsize=6,
 
 fig.text(0.5, 0.95, 'Per-protein Spearman ρ: partner feature vs miscibility',
          ha='center', fontsize=9, fontweight='bold', fontfamily='Arial')
-fig.savefig(os.path.join(OUT_DIR, 'EDF7b_perprotein_heatmap.pdf'),
+fig.savefig(os.path.join(OUT_DIR, 'perprotein_heatmap.pdf'),
             bbox_inches='tight', dpi=300)
 plt.close(fig)
-print('Saved EDF7b_perprotein_heatmap.pdf')
+print('Saved perprotein_heatmap.pdf')
 
 # ── Grouping: raw p < 0.05 ────────────────────────────────────────────────────
 fyw_idx   = feat_labels.index('FYW')
@@ -258,8 +258,8 @@ def group_comparison(group_mask, group_name, out_pdf):
                    'Median_others', 'Median_diff(A-B)', 'U', 'p_two_sided', 'FDR_BH']]
 
 print('\n=== Plotting group comparison bars (Fig c, d) ===')
-df_fyw_comp   = group_comparison(fyw_pos_mask,   'FYW-positive group',   'EDF7c_FYW_positive_group.pdf')
-df_edkrh_comp = group_comparison(edkrh_neg_mask, 'EDKRH-negative group', 'EDF7d_EDKRH_negative_group.pdf')
+df_fyw_comp   = group_comparison(fyw_pos_mask,   'FYW-positive group',   'FYW_positive_group.pdf')
+df_edkrh_comp = group_comparison(edkrh_neg_mask, 'EDKRH-negative group', 'EDKRH_negative_group.pdf')
 
 # ── Save Excel ─────────────────────────────────────────────────────────────────
 rows_long = []
