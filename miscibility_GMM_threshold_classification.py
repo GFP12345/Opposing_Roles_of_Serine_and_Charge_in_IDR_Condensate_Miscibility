@@ -1,6 +1,6 @@
 # miscibility_GMM_threshold_classification.py
 # Two-component GMM on 378 pairwise miscibility scores.
-# Reproduces Extended Data Fig. 1l
+# Reproduces Extended Data Fig. 1j
 # Determines the miscible/immiscible classification threshold (r ~ 0.45).
 # Input : Source Data/Source Data Fig. 1.xlsx
 #           sheet: IDR_Pair_Miscibility(Fig1b)
