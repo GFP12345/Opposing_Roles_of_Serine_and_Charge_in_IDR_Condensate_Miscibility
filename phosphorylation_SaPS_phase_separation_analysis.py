@@ -1,7 +1,7 @@
 # phosphorylation_SaPS_phase_separation_analysis.py
 # Phosphorylation vs phase separation analysis.
 # Reproduces Fig. 5b, 5c, 5e.
-# Input : Supplementary Data/Supplementary Data 4.xlsx
+# Input : AnalysisInputData.xlsx
 #           sheets: Protein_PS_Predict, High_Phosph_for_GO, Core_Splicing_Protein
 # Output: phosphorylation_phase_separation_analysis/
 
@@ -45,7 +45,7 @@ def read_sheet(path, keyword, **kwargs):
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 HERE    = os.path.dirname(os.path.abspath(__file__))
-T4      = os.path.join(HERE, 'Supplementary Data', 'Supplementary Data 4.xlsx')
+T4      = os.path.join(HERE, 'AnalysisInputData.xlsx')
 OUT_DIR = os.path.join(HERE, 'phosphorylation_phase_separation_analysis')
 os.makedirs(OUT_DIR, exist_ok=True)
 
@@ -108,64 +108,8 @@ else:
     print('  Column names differ from expected — printing all columns for manual inspection:')
     print(df4a.columns.tolist())
 
-# ── Module 2: SaPS WT vs Phosphorylated scatter (Fig 5c) ──────────────────────
-print('\n=== Module 2: SaPS WT vs Phosphorylated (Fig 5c) ===')
-saps_wt_col   = [c for c in df4a.columns if 'wt' in c.lower() or 'native' in c.lower() or 'saps' in c.lower()]
-saps_phos_col = [c for c in df4a.columns if 'phos' in c.lower() and 'saps' in c.lower()]
-print(f'  Candidate WT SaPS cols: {saps_wt_col}')
-print(f'  Candidate Phos SaPS cols: {saps_phos_col}')
-
-# Try to find WT and Phos SaPS columns
-wt_col   = next((c for c in df4a.columns if 'SaPS' in c and ('WT' in c or 'wt' in c or 'native' in c.lower())), None)
-phos_col2 = next((c for c in df4a.columns if 'SaPS' in c and 'phos' in c.lower()), None)
-
-if wt_col and phos_col2:
-    wt_vals   = pd.to_numeric(df4a[wt_col],   errors='coerce').dropna()
-    phos_vals = pd.to_numeric(df4a[phos_col2], errors='coerce')
-    phos_vals = phos_vals[wt_vals.index].dropna()
-    wt_vals   = wt_vals[phos_vals.index]
-
-    stat, p_wilcox = wilcoxon(phos_vals - wt_vals)
-    print(f'  Wilcoxon signed-rank p={p_wilcox:.3e}')
-
-    # Color by category
-    threshold_saps = 0.5
-    colors_scatter = []
-    for w, ph in zip(wt_vals, phos_vals):
-        if w < threshold_saps and ph >= threshold_saps:
-            colors_scatter.append('#c0504d')   # crossed up
-        elif w >= threshold_saps and ph < threshold_saps:
-            colors_scatter.append('#4caf50')   # crossed down
-        elif ph > w:
-            colors_scatter.append('black')     # increased
-        else:
-            colors_scatter.append('#aaaaaa')   # decreased
-
-    fig, ax = plt.subplots(figsize=(4.5, 4.5))
-    fig.subplots_adjust(top=0.82, bottom=0.14, left=0.15, right=0.95)
-    ax.scatter(wt_vals, phos_vals, c=colors_scatter, s=8, alpha=0.6, linewidths=0)
-    ax.axhline(threshold_saps, color='gray', ls='--', lw=0.8)
-    ax.axvline(threshold_saps, color='gray', ls='--', lw=0.8)
-    ax.plot([0, 1], [0, 1], 'k--', lw=0.8, alpha=0.4)
-    ax.set_xlabel('SaPS score (WT)', fontsize=9, fontweight='bold')
-    ax.set_ylabel('SaPS score (Phosphorylated)', fontsize=9, fontweight='bold')
-    ax.tick_params(labelsize=8)
-    for lbl in ax.get_xticklabels() + ax.get_yticklabels():
-        lbl.set_fontweight('bold')
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    fig.text(0.5, 0.88, f'SaPS: WT vs Phosphorylated (Wilcoxon p={p_wilcox:.2e})',
-             ha='center', fontsize=8, fontweight='bold')
-    fig.savefig(os.path.join(OUT_DIR, 'SaPS_WT_vs_phosphorylated_scatter.pdf'), bbox_inches='tight', dpi=300)
-    plt.close(fig)
-    print('Saved SaPS_WT_vs_phosphorylated_scatter.pdf')
-else:
-    print('  Could not auto-detect SaPS WT/Phos columns. Columns available:')
-    print(df4a.columns.tolist())
-
-# ── Module 3: S+Y fraction vs phosphorylation fraction scatter (Fig 5e) ───────
-# ── Module 3: S+Y fraction vs phosphorylation fraction scatter (Fig 5e) ───────
-print('\n=== Module 3: S+Y fraction vs phosphorylation fraction (Fig 5e) ===')
+# ── Module 2: S+Y fraction vs phosphorylation fraction scatter (Fig 5e) ───────
+print('\n=== Module 2: S+Y fraction vs phosphorylation fraction (Fig 5e) ===')
 df4b = read_sheet(T4, 'High_Phosph_for_GO')
 df4c = read_sheet(T4, 'Core_Splicing_Protein')
 print(f'  Table 4b shape: {df4b.shape}')
@@ -231,8 +175,8 @@ fig.savefig(os.path.join(OUT_DIR, 'SY_fraction_vs_phosphorylation_scatter.pdf'),
 plt.close(fig)
 print('Saved SY_fraction_vs_phosphorylation_scatter.pdf')
 
-# ── Module 4: SaPS WT vs Phosphorylated scatter (Fig 5c) ──────────────────────
-print('\n=== Module 4: SaPS WT vs Phosphorylated (Fig 5c) ===')
+# ── Module 3: SaPS WT vs Phosphorylated scatter (Fig 5c) ──────────────────────
+print('\n=== Module 3: SaPS WT vs Phosphorylated (Fig 5c) ===')
 df4a = read_sheet(T4, 'Protein_PS_Predict')
 wt_col   = 'SaPS(WT)'
 phos_col = 'SaPS(S/Y_Phos)'
@@ -310,4 +254,33 @@ fig.savefig(os.path.join(OUT_DIR, 'SaPS_phospho_effect_scatter.pdf'),
 plt.close(fig)
 print('Saved SaPS_phospho_effect_scatter.pdf')
 
+# ── Excel output ───────────────────────────────────────────────────────────────
+print('\n=== Saving Excel output ===')
+
+# Sheet 1: Input — Protein_PS_Predict (used for Fig 5c scatter)
+df4a_out = read_sheet(T4, 'Protein_PS_Predict')
+
+# Sheet 2: Input — High_Phosph_for_GO + Core_Splicing_Protein (used for Fig 5e scatter)
+df4b_out = read_sheet(T4, 'High_Phosph_for_GO')
+df4c_out = read_sheet(T4, 'Core_Splicing_Protein')
+
+# Sheet 3: Results — SaPS scatter statistics (Fig 5c)
+df_saps_stats = pd.DataFrame([{
+    'n_total':        int(mask4a.sum()),
+    'n_crossed_up':   int(n_up),
+    'n_crossed_down': int(n_down),
+    'n_increased':    int(n_inc),
+    'n_decreased':    int(n_dec),
+    'Wilcoxon_p':     float(p_wilcox),
+    'threshold':      threshold,
+}])
+
+with pd.ExcelWriter(os.path.join(OUT_DIR, 'phosphorylation_SaPS_results.xlsx'),
+                    engine='openpyxl') as writer:
+    df4a_out.to_excel(writer, sheet_name='Input_Protein_PS_Predict', index=False)
+    df4b_out.to_excel(writer, sheet_name='Input_High_Phosph_for_GO', index=False)
+    df4c_out.to_excel(writer, sheet_name='Input_Core_Splicing_Protein', index=False)
+    df_saps_stats.to_excel(writer, sheet_name='Results_SaPS_scatter_stats', index=False)
+
+print('Saved phosphorylation_SaPS_results.xlsx')
 print(f'\nAll outputs saved to {OUT_DIR}')
