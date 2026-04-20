@@ -2,10 +2,9 @@
 # Hierarchical clustering of 28 IDRs by miscibility profile.
 # Produces dendrogram, intra-cluster boxplot, and AA composition heatmap.
 # Reproduces Extended Data Fig. 3a, 3b, 3c.
-# Input : Supplementary Data/Supplementary Data 1.xlsx
-#           sheet: AA_composition_(28_IDRs)
-#         Source Data/Source Data Fig. 1.xlsx
+# Input : AnalysisInputData.xlsx
 #           sheet: IDR_Pair_Miscibility(Fig1b)
+#           sheet: AA_composition_(28_IDRs)
 # Output: IDR_hierarchical_clustering/
 
 import sys
@@ -24,8 +23,8 @@ from scipy.stats import mannwhitneyu
 import openpyxl
 
 HERE    = os.path.dirname(os.path.abspath(__file__))
-T1      = os.path.join(HERE, 'Supplementary Data', 'Supplementary Data 1.xlsx')
-T2      = os.path.join(HERE, 'Source Data', 'Source Data Fig. 1.xlsx')
+T1      = os.path.join(HERE, 'AnalysisInputData.xlsx')
+T2      = os.path.join(HERE, 'AnalysisInputData.xlsx')
 OUT_DIR = os.path.join(HERE, 'IDR_hierarchical_clustering')
 os.makedirs(OUT_DIR, exist_ok=True)
 
