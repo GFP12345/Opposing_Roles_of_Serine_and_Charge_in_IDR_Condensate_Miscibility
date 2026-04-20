@@ -2,7 +2,7 @@
 # Two-component GMM on 378 pairwise miscibility scores.
 # Reproduces Extended Data Fig. 1j
 # Determines the miscible/immiscible classification threshold (r ~ 0.45).
-# Input : Source Data/Source Data Fig. 1.xlsx
+# Input : AnalysisInputData.xlsx
 #           sheet: IDR_Pair_Miscibility(Fig1b)
 # Output: GMM_miscibility_threshold/
 
@@ -22,7 +22,7 @@ from sklearn.mixture import GaussianMixture
 import openpyxl
 
 HERE    = os.path.dirname(os.path.abspath(__file__))
-T2      = os.path.join(HERE, 'Source Data', 'Source Data Fig. 1.xlsx')
+T2      = os.path.join(HERE, 'AnalysisInputData.xlsx')
 OUT_DIR = os.path.join(HERE, 'GMM_miscibility_threshold')
 os.makedirs(OUT_DIR, exist_ok=True)
 
