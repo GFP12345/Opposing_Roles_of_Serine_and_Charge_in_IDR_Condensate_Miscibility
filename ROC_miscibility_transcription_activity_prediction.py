@@ -2,8 +2,8 @@
 # ROC/AUC analysis for miscibility vs transcriptional activity.
 # Task A: Pol II nuclear miscibility predicts Activation/Repression class (Fig. 6e).
 # Task B: transcriptional activity predicts High/Low miscibility class (Fig. 6f).
-# Input : Source Data/Source Data Fig. 6.xlsx
-#           sheets: Dual-Luc-Assay(Fig6a), PearsonWithPolII(Fig6&EDF10)
+# Input : AnalysisInputData.xlsx
+#           sheet: ROC_input_21IDRs(Fig6e,f)
 # Output: ROC_miscibility_transcription_activity/
 
 import sys
@@ -46,7 +46,7 @@ def read_sheet(path, keyword, **kwargs):
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 HERE    = os.path.dirname(os.path.abspath(__file__))
-T5      = os.path.join(HERE, 'Source Data', 'Source Data Fig. 6.xlsx')
+T5      = os.path.join(HERE, 'AnalysisInputData.xlsx')
 OUT_DIR = os.path.join(HERE, 'ROC_miscibility_transcription_activity')
 os.makedirs(OUT_DIR, exist_ok=True)
 
@@ -54,61 +54,12 @@ matplotlib.rcParams['font.family'] = 'Arial'
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 # ── Load data ──────────────────────────────────────────────────────────────────
-df_luc  = read_sheet(T5, 'Dual-Luc-Assay(Fig6a)')
+# Load pre-computed analysis input: log10_activity, PolII_miscibility, and binary labels
+df_analysis = read_sheet(T5, 'ROC_input_21IDRs(Fig6e,f)')
+name_col = 'Protein(IDR-SOX2)'
 
-# Nuclear Pol II miscibility (mean Pearson r within nucleus).
-df_nuclear = read_sheet(T5, 'PearsonWithPolII(Fig6&EDF10)')
-misc_polii_nuclear = dict(zip(
-    df_nuclear['IDR-Pair-with-PolII'].astype(str),
-    pd.to_numeric(df_nuclear['mean_Pearson_with_PolII(in-nuclear)'], errors='coerce')
-))
-
-print('=== Luciferase data ===')
-print(df_luc.columns.tolist())
-print(df_luc.head(3).to_string())
-
-# ── Compute mean transcriptional activity per IDR ─────────────────────────────
-rep_cols = [c for c in df_luc.columns if 'repeat' in c.lower() or 'level' in c.lower()]
-name_col = df_luc.columns[0]
-
-df_luc['mean_activity'] = df_luc[rep_cols].apply(pd.to_numeric, errors='coerce').mean(axis=1)
-
-# Normalize to Ctrl
-ctrl_mask = df_luc[name_col].astype(str).str.lower().str.contains('ctrl|control')
-ctrl_mean = df_luc.loc[ctrl_mask, 'mean_activity'].mean()
-df_luc['relative_activity'] = df_luc['mean_activity'] / ctrl_mean
-df_luc['log10_activity']    = np.log10(df_luc['relative_activity'].clip(1e-6))
-
-print(f'\nCtrl mean activity: {ctrl_mean:.4f}')
-print(df_luc[[name_col, 'mean_activity', 'relative_activity', 'log10_activity']].to_string())
-
-# ── Get Pol II nuclear miscibility for each IDR ───────────────────────────────
-# Use nuclear Pearson r — matches nuclear miscibility axis definition
-df_luc['PolII_miscibility'] = df_luc[name_col].apply(
-    lambda x: misc_polii_nuclear.get(
-        str(x).replace('-SOX2(DBD)', '').replace('-SOX2', '').strip(), np.nan))
-
-print(f'\nPol II nuclear miscibility matched for '
-      f'{df_luc["PolII_miscibility"].notna().sum()} proteins')
-
-# Exclude non-significant IDRs (5 excluded per Methods): exact name match
-# Use word-boundary matching to avoid 'MED1' accidentally excluding 'MED15'
-exclude_list = ['TDP43', 'MED1', 'hnRNPH1', 'BRD4', 'PRCC', 'HES4']
-
-def _is_excluded(name):
-    stripped = str(name).replace('-SOX2(DBD)', '').replace('-SOX2', '').strip()
-    return stripped in exclude_list
-
-df_analysis = df_luc[~df_luc[name_col].astype(str).apply(_is_excluded)].copy()
-df_analysis = df_analysis[~ctrl_mask.reindex(df_analysis.index, fill_value=False)].copy()
-df_analysis = df_analysis.dropna(subset=['log10_activity', 'PolII_miscibility'])
-print(f'\nAnalysis set n={len(df_analysis)}')
-
-# ── Define binary labels ───────────────────────────────────────────────────────
-MISC_THRESHOLD = 0.45   # per Methods: r >= 0.45 = High miscibility (GMM threshold)
-df_analysis['Activation_label'] = (df_analysis['log10_activity'] > 0).astype(int)
-df_analysis['HighMisc_label']   = (df_analysis['PolII_miscibility'] > MISC_THRESHOLD).astype(int)
-
+print('=== ROC input data (n=21) ===')
+print(df_analysis.to_string())
 print(f'\nActivation: {df_analysis["Activation_label"].sum()} positive, '
       f'{(df_analysis["Activation_label"]==0).sum()} negative')
 print(f'High miscibility: {df_analysis["HighMisc_label"].sum()} positive, '
