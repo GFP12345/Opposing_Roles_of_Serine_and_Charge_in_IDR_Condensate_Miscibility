@@ -2,9 +2,8 @@
 # Per-protein Spearman: each protein vs 27 partners.
 # Reproduces Extended Data Fig. 4b (heatmap), 4c (FYW-positive bar), 4d (EDKRH-negative bar).
 # Grouping uses raw p < 0.05. FDR (per-column BH) written to Excel only.
-# Input : Source Data/Source Data Fig. 1.xlsx
+# Input : AnalysisInputData.xlsx
 #           sheet: IDR_Pair_Miscibility(Fig1b)
-#         Supplementary Data/Supplementary Data 1.xlsx
 #           sheet: AA_composition_(28_IDRs)
 # Output: perprotein_spearman_miscibility/
 
@@ -59,8 +58,8 @@ def col_fdr(p_mat):
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 HERE    = os.path.dirname(os.path.abspath(__file__))
-T2      = os.path.join(HERE, 'Source Data', 'Source Data Fig. 1.xlsx')
-T1      = os.path.join(HERE, 'Supplementary Data', 'Supplementary Data 1.xlsx')
+T2      = os.path.join(HERE, 'AnalysisInputData.xlsx')
+T1      = os.path.join(HERE, 'AnalysisInputData.xlsx')
 OUT_DIR = os.path.join(HERE, 'perprotein_spearman_miscibility')
 os.makedirs(OUT_DIR, exist_ok=True)
 
